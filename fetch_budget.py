@@ -67,8 +67,12 @@ def fetch_budget():
 	# download the docs
 	logger.info('fetching files')
 	for link in parser.links:
-		logger.info(u'fetching {}'.format(link['text']))
-		urllib.urlretrieve('https://www.whitehouse.gov'+link['link'],u'raw_budget_files/'+link['text'])
+		filename = u'{name}.{extension}'.format(
+			name=link['text'].strip(),
+			extension=link['link'].split('.')[-1]
+		)
+		logger.info(u'fetching {}'.format(filename))
+		urllib.urlretrieve('https://www.whitehouse.gov'+link['link'],u'data/raw_budget_files/{}'.format(filename))
 		logger.info('finished fetching')
 	logger.info('finished fetching files')
 

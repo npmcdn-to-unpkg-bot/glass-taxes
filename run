@@ -1,3 +1,7 @@
 #!/bin/bash
+# make sure the directory structure is setup
+mkdir -p data/raw_budget_files
+mkdir -p data/json_budget_files
+
 # start the server
 python -m SimpleHTTPServer

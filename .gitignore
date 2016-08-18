@@ -1,2 +1,5 @@
+# compiled python
 *.pyc
-raw_budget_files/*
+
+# data files
+data/*
