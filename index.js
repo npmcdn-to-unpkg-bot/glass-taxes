@@ -1,5 +1,7 @@
-var test_data = [-10, -5, -2, 4, 6, 20, 7, 3, 0, -2, -4,
-                     -3, 0, 5, 3, 2, 1, 3, 8, 10];
+var budget_data = {
+    url: '/data/json_budget_files/Table 1.json',
+    field_name: 'Surplus or Deficit (–) As Percentages of GDP'
+}
 
 var TimeSeries = React.createClass({
     render: function(){
@@ -8,18 +10,42 @@ var TimeSeries = React.createClass({
         );
     },
     componentDidMount: function(){
+
+        //AJAX request for data
+        var httpRequest = new XMLHttpRequest();
+        httpRequest.onreadystatechange = function(resp){
+            if (resp.readyState === XMLHttpRequest.DONE){
+                // response is done
+                if (resp.status == 200){
+                    // response is good
+                    var data = JSON.parse(resp.responseText);
+                    var transformed_data = data.map(function(d){return d[budget_data['field_name']]});
+                    console.log(transformed_data);
+                    this.renderData(transformed_data);
+                }else{
+                    // response is bust
+                    console.log('Response: ',resp.status)
+                }
+            }
+        }.bind(this,httpRequest);
+        httpRequest.open('GET',budget_data['url']);
+        httpRequest.send(null);
+
+        // this.renderData(this.props.data)
+    },
+    renderData : function(data){
         var padding = 30;
 
         // figure out the x axis
-        var num_data = this.props.data.length;
+        var num_data = data.length;
         var w = (this.props.width-2*padding)/num_data - 1;
         var x_scale = d3.scaleLinear()
-            .domain([0, this.props.data.length-1])
+            .domain([0, data.length-1])
             .range ([padding,this.props.width-padding])
 
         // figure out the y axis
-        var min_data = Math.min(0,Math.min.apply(Math,this.props.data));
-        var max_data = Math.max(0,Math.max.apply(Math,this.props.data));
+        var min_data = Math.min(0,Math.min.apply(Math,data));
+        var max_data = Math.max(0,Math.max.apply(Math,data));
 
         var y_scale = d3.scaleLinear()
             .domain([min_data, max_data])
@@ -45,7 +71,7 @@ var TimeSeries = React.createClass({
         
         //plot the bars
         svg.selectAll('rect')
-            .data(this.props.data)
+            .data(data)
             .enter()
             .append('rect')
             .attr('x', function(d,i){return padding+i*(w+1)})
@@ -56,7 +82,7 @@ var TimeSeries = React.createClass({
                 if (d<0) return 'rgb(204,0,0)'
                 else if (d>0) return 'rgb(0,153,0)'
                 else return 'black'
-            })
+            });
     }
 });
 
@@ -64,7 +90,7 @@ var TimeSeries = React.createClass({
 ReactDOM.render(
     <div>
         <h1>GlassTaxes</h1>
-        <TimeSeries height={300} width={500} data={test_data} graph_id={'total_budget_spend'}/>
+        <TimeSeries height={300} width={500} graph_id={'total_budget_spend'}/>
     </div>,
     document.getElementById('content')
 )
