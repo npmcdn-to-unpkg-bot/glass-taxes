@@ -11,7 +11,7 @@ var AsyncBarChart = React.createClass({
         this.props.get_data(this.renderData)
     },
     renderData : function(data){
-        var padding = 30;
+        var padding = 60;
 
         // figure out the x axis
         var num_data = data.length;

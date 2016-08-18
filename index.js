@@ -24,6 +24,16 @@ var budget_current_dollars_data = {
     url: '/data/json_budget_files/Table 1.3—Summary of Receipts, Outlays, and Surpluses or Deficits (-) in Current Dollars, Constant (FY 2009) Dollars, and as Percentages of GDP: 1940–2021.json',
     field_name: 'Surplus or Deficit (–) In Current Dollars'
 }
+var budget_fixed_dollars_data = {
+    url: '/data/json_budget_files/Table 1.3—Summary of Receipts, Outlays, and Surpluses or Deficits (-) in Current Dollars, Constant (FY 2009) Dollars, and as Percentages of GDP: 1940–2021.json',
+    field_name: 'Surplus or Deficit (–) In Constant (FY 2009) Dollars'
+}
+
+var receipt_by_fund_group_data = {
+    url: '/data/json_budget_files/Table 1.4—Receipts, Outlays, and Surpluses or Deficits (-) by Fund Group: 1934–2021.json',
+    field_name: 'Federal Funds Outlays'
+}
+
 var get_budget_gdp_data = get_data.bind(
                                 null,
                                 budget_gdp_data['url'],
@@ -32,6 +42,15 @@ var get_budget_current_dollars_data = get_data.bind(
                                             null,
                                             budget_current_dollars_data['url'],
                                             function(d){return d[budget_current_dollars_data['field_name']]});
+var get_budget_fixed_dollars_data = get_data.bind(
+                                            null,
+                                            budget_fixed_dollars_data['url'],
+                                            function(d){return d[budget_fixed_dollars_data['field_name']]});
+
+var get_receipt_by_fund_group_data = get_data.bind(
+                                            null,
+                                            receipt_by_fund_group_data['url'],
+                                            function(d){return d[receipt_by_fund_group_data['field_name']]});
 
 // render the data
 ReactDOM.render(
@@ -41,6 +60,10 @@ ReactDOM.render(
         <AsyncBarChart height={300} width={500} graph_id={'budget_gdp_data'} get_data={get_budget_gdp_data}/>
         <h2>{budget_current_dollars_data['field_name']}</h2>
         <AsyncBarChart height={300} width={500} graph_id={'budget_current_dollars_data'} get_data={get_budget_current_dollars_data}/>
+        <h2>{budget_fixed_dollars_data['field_name']}</h2>
+        <AsyncBarChart height={300} width={500} graph_id={'budget_fixed_dollars_data'} get_data={get_budget_fixed_dollars_data}/>
+        <h2>{receipt_by_fund_group_data['field_name']}</h2>
+        <AsyncBarChart height={300} width={500} graph_id={'receipt_by_fund_group_data'} get_data={get_receipt_by_fund_group_data}/>
     </div>,
     document.getElementById('content')
 );

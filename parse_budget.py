@@ -3,17 +3,20 @@ import re
 import xlrd
 import json
 
+from logger import logger
+
+raw_data_path = './data/raw_budget_files'
+json_data_path = './data/json_budget_files'
 
 def get_budget_filenames(directory):
 	filenames = os.walk(directory).next()[2]
 	return filenames
 
 
-def get_summary_file(filenames):
-	summary_pattern = r'.*summary of receipts.*current dollars.*'
-	for file in filenames:
-		if re.match(summary_pattern,file, flags=re.IGNORECASE):
-			return file
+def match_filename_pattern(filenames, pattern):
+	for filename in filenames:
+		if re.match(pattern, filename, flags=re.IGNORECASE):
+			return filename
 
 
 def parse_header(sheet):
@@ -34,7 +37,7 @@ def parse_header(sheet):
 			last_secondary_header = current_secondary_header
 
 		header = ' '.join([last_secondary_header, last_primary_header])
-		header_list.append(header)
+		header_list.append(header.strip())
 
 	return header_list
 
@@ -61,31 +64,36 @@ def parse_data(sheet, header):
 			
 	return data
 
+
 def save_as_json(data, filename):
 	with open(filename, 'w') as file:
 		json.dump(data,file)
+	logger.info('successfully converted {}'.format(filename))
 
 
-if __name__ == '__main__':
-	import pprint
-	pp = pprint.PrettyPrinter(indent=4)
-
-	raw_data_path = './data/raw_budget_files'
-	json_data_path = './data/json_budget_files'
-
-	filenames = get_budget_filenames(raw_data_path)
-	summary_file = get_summary_file(filenames)
-
-	book = xlrd.open_workbook(os.path.join(raw_data_path,summary_file))
+def load_and_save_as_json(filename):
+	# load the file to memory
+	book = xlrd.open_workbook(os.path.join(raw_data_path, filename))
 	sheet = book.sheet_by_index(0)
 	book.release_resources()
 
+	# extract the data from the sheet
 	header = parse_header(sheet)
 	data = parse_data(sheet, header)
 
-	summary_json_filename = summary_file.split('.')
-	print summary_json_filename
-	summary_json_filename[-1] = 'json'
-	summary_json_filename = '.'.join(summary_json_filename)
-	save_as_json(data,os.path.join(json_data_path,summary_json_filename))
-	# pp.pprint(data)
+	# replace the current extension with json
+	json_filename = filename.split('.')
+	json_filename[-1] = 'json'
+	json_filename = '.'.join(json_filename)
+
+	# save the file to disk
+	save_as_json(data,os.path.join(json_data_path,json_filename))
+
+
+if __name__ == '__main__':
+	filenames = get_budget_filenames(raw_data_path)
+	summary_filename = match_filename_pattern(filenames, r'.*summary of receipts.*current dollars.*')
+	fund_group_split_filename = match_filename_pattern(filenames, r'.*receipts.*by fund group.*')
+	load_and_save_as_json(summary_filename)
+	load_and_save_as_json(fund_group_split_filename)
+	
