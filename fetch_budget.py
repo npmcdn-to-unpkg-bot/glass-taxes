@@ -1,5 +1,4 @@
 from logger import logger
-import xlrd
 import urllib
 from HTMLParser import HTMLParser
 from htmlentitydefs import name2codepoint
@@ -56,7 +55,7 @@ class FederalBudgetParser(HTMLParser):
 	def in_content_table(self):
 		return 'table' in self.tag_stack
 
-def fetch_budget_docs():
+def fetch_budget():
 	parser = FederalBudgetParser()
 
 	# feed the parser the data
@@ -74,4 +73,4 @@ def fetch_budget_docs():
 	logger.info('finished fetching files')
 
 if __name__ == "__main__":
-	fetch_budget_docs()
+	fetch_budget()
