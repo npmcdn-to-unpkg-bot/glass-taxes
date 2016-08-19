@@ -10,7 +10,7 @@ var formatting = {
 	fill:function(d){
 		if (accessor(d)>0) return 'rgb(0,153,0)';
 		else if (accessor(d)<0) return 'rgb(204,0,0)';
-        else return 'black'
+        else return 'black';
 	}
 };
 

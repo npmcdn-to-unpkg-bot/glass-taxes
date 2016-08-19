@@ -14,7 +14,6 @@ var BasicBarChart = React.createClass({
 		};
 
 		var data = this.state.data
-
 		// figure out x-axis
 		var num_data = data.length;
         var w = (this.props.width-padding.right-padding.left)/num_data - 1;
@@ -32,7 +31,7 @@ var BasicBarChart = React.createClass({
             .range([this.props.height-padding.bottom, padding.top]);
         var zero_height = y_scale(0);
         var h = function (d) {return Math.abs(y_scale(this.props.accessData(d))-y_scale(0)) || 1;}.bind(this);
-        var y = function (d) {return d<0 ? zero_height : zero_height - h(this.props.accessData(d));}.bind(this);
+        var y = function (d) {return this.props.accessData(d)<0 ? zero_height : zero_height - h(d);}.bind(this);
 
         // locate the drawing board
         var svg = d3.select('#'+this.props.graph_id);
@@ -75,8 +74,10 @@ var BasicBarChart = React.createClass({
 	componentDidMount: function(){
 		// handle both callbacks and explicit data
 		if(typeof(this.props.data) == 'function'){
+			console.log('creating data from a function')
 			this.props.data(this.setData);
 		}else{
+			console.log('creating data from a list')
 			this.setData(this.props.data);
 		}
 	},
