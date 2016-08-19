@@ -31,6 +31,11 @@ var budget_fixed_dollars_data = {
 
 var receipt_by_fund_group_data = {
     url: '/data/json_budget_files/Table 1.4—Receipts, Outlays, and Surpluses or Deficits (-) by Fund Group: 1934–2021.json',
+    field_name: 'Federal Funds Receipts'
+}
+
+var outlay_by_fund_group_data = {
+    url: '/data/json_budget_files/Table 1.4—Receipts, Outlays, and Surpluses or Deficits (-) by Fund Group: 1934–2021.json',
     field_name: 'Federal Funds Outlays'
 }
 
@@ -52,6 +57,11 @@ var get_receipt_by_fund_group_data = get_data.bind(
                                             receipt_by_fund_group_data['url'],
                                             function(d){return d[receipt_by_fund_group_data['field_name']]});
 
+var get_outlay_by_fund_group_data = get_data.bind(
+                                            null,
+                                            receipt_by_fund_group_data['url'],
+                                            function(d){return -d[outlay_by_fund_group_data['field_name']]});
+
 // render the data
 ReactDOM.render(
     <div>
@@ -62,8 +72,6 @@ ReactDOM.render(
         <AsyncBarChart height={300} width={500} graph_id={'budget_current_dollars_data'} get_data={get_budget_current_dollars_data}/>
         <h2>{budget_fixed_dollars_data['field_name']}</h2>
         <AsyncBarChart height={300} width={500} graph_id={'budget_fixed_dollars_data'} get_data={get_budget_fixed_dollars_data}/>
-        <h2>{receipt_by_fund_group_data['field_name']}</h2>
-        <AsyncBarChart height={300} width={500} graph_id={'receipt_by_fund_group_data'} get_data={get_receipt_by_fund_group_data}/>
     </div>,
     document.getElementById('content')
 );
