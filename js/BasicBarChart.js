@@ -1,21 +1,21 @@
 var BasicBarChart = React.createClass({
-	getInitialState : function(){
-		return {data:[]}
-	},
-	setData : function(data) {
-		this.setState({data:data});
-	},
-	renderData : function() {
-		var padding = {
-			right:10,
-			left:60,
-			bottom:30,
-			top:10
-		};
+    getInitialState : function(){
+        return {data:[]}
+    },
+    setData : function(data) {
+        this.setState({data:data});
+    },
+    renderData : function() {
+        var padding = {
+            right:10,
+            left:60,
+            bottom:30,
+            top:10
+        };
 
-		var data = this.state.data
-		// figure out x-axis
-		var num_data = data.length;
+        var data = this.state.data
+        // figure out x-axis
+        var num_data = data.length;
         var w = (this.props.width-padding.right-padding.left)/num_data - 1;
         var x = function(d,i){return padding.left+i*(w+1)};
         var x_scale = d3.scaleLinear()
@@ -60,39 +60,41 @@ var BasicBarChart = React.createClass({
 
         // apply the rest of the user-defined formatting to the chart
         if (this.props.formatting){
-	        for (var f in this.props.formatting){
-	        	rects = rects.attr(f, this.props.formatting[f]);
-	        }
+            for (var f in this.props.formatting){
+                if (typeof(this.props.formatting[f] == 'function')){
+                    rects = rects.attr(f, function(d){return this.props.formatting[f](this.props.accessData(d))}.bind(this));
+                }else{
+                    rects = rects.attr(f, this.props.formatting[f]);
+                }
+            }
         }
 
-	},
-	clearData : function() {
-		d3.select('#' + this.props.graph_id)
-			.selectAll('*')
-			.remove();
-	},
-	componentDidMount: function(){
-		// handle both callbacks and explicit data
-		if(typeof(this.props.data) == 'function'){
-			console.log('creating data from a function')
-			this.props.data(this.setData);
-		}else{
-			console.log('creating data from a list')
-			this.setData(this.props.data);
-		}
-	},
-	componentDidUpdate: function(){
-		this.clearData();
-		this.renderData();
-	},
-	render : function(){
-		return (
-			<svg height={this.props.height}
-			 width={this.props.width}
-			 id={this.props.graph_id}>
-			</svg>
-		);
-	}
+    },
+    clearData : function() {
+        d3.select('#' + this.props.graph_id)
+            .selectAll('*')
+            .remove();
+    },
+    componentDidMount: function(){
+        // handle both callbacks and explicit data
+        if(typeof(this.props.data) == 'function'){
+            this.props.data(this.setData);
+        }else{
+            this.setData(this.props.data);
+        }
+    },
+    componentDidUpdate: function(){
+        this.clearData();
+        this.renderData();
+    },
+    render : function(){
+        return (
+            <svg height={this.props.height}
+             width={this.props.width}
+             id={this.props.graph_id}>
+            </svg>
+        );
+    }
 });
 
 window.BasicBarChart = BasicBarChart;
